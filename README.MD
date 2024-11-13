@@ -62,16 +62,32 @@ You can modify the `playwright.config.ts` to adjust settings like base URL, test
 
 ### 6. Run the Tests
 
-To run all the tests with the specified BASE_URL and config file, use the following command:
+Running Tests on Different Environments
+To run all tests on the Local environment:
 
 ```bash
 BASE_URL="http://localhost:4000/fashionhub/" npx playwright test --config=config/playwright.config.ts
 ```
 
-If you want to run a specific test file, you can use the following command:
+If you want to run a the PR task, run the following command:
 
 ```bash
-npx playwright test tests/homepage.test.ts
+BASE_URL="http://localhost:4000/fashionhub/" npx playwright test tests/pr-status.test.ts --config=config/playwright.config.ts
+```
+
+To run all tests on the Staging environment (dummy environment):
+```bash
+BASE_URL="https://staging-env/fashionhub/" npx playwright test --config=config/playwright.config.ts
+```
+
+To run all tests on the Production environment:
+```bash
+BASE_URL="https://pocketaces2.github.io/fashionhub/" npx playwright test --config=config/playwright.config.ts
+```
+
+If you want to run a specific test file, you can use the following command:
+```bash
+BASE_URL="http://localhost:4000/fashionhub/" npx playwright test tests/homepage.test.ts --config=config/playwright.config.ts
 ```
 
 ## Utility Functions
@@ -90,6 +106,73 @@ test('example test', async ({ page }) => {
   // Continue with test steps
 });
 ```
+
+- **`fetchOpenPRs`**: Fetches open pull requests from a GitHub repository using the GitHub API. Extracts essential information for each PR, including the PR name, created date, and author.
+
+### Example Usage of `fetchOpenPRs`
+
+```typescript
+import { fetchOpenPRs } from '../utils/fetchOpenPRs.ts';
+
+test('fetch open PRs test', async () => {
+  const prs = await fetchOpenPRs();
+  console.log(prs);
+  // Use PR data in your test
+});
+```
+
+- **`convertToCSV`**: Converts a JSON array of pull request data into a CSV format. This function utilizes the json2csv parser to handle CSV conversion.
+
+### Example Usage of `convertToCSV`
+
+```typescript
+import { convertToCSV } from '../utils/convertToCSV.ts';
+
+const prsData = [
+  { pr_name: 'Fix login issue', created_at: '2023-11-12', author: 'user123' },
+];
+
+const csvData = convertToCSV(prsData);
+console.log(csvData); // Outputs the CSV format of PR data
+```
+
+- **`writeCSVToFile`**: Writes a CSV-formatted string to a file. This utility function saves the CSV data to open_pull_requests.csv by default in the root project directory.
+
+### Example Usage of `writeCSVToFile`
+
+```typescript
+import { writeCSVToFile } from '../utils/writeCSVToFile.ts';
+
+const csvData = 'pr_name,created_at,author\nFix login issue,2023-11-12,user123';
+writeCSVToFile(csvData);
+```
+
+- **`findAllLinks`**: Finds all anchor (<a>) tags on a page and returns their href attributes. Useful for link status verification in tests.
+
+### Example Usage of `findAllLinks`
+
+```typescript
+import { findAllLinks } from '../utils/findAllLinks.ts';
+
+test('link status test', async ({ page }) => {
+  const links = await findAllLinks(page);
+  console.log(links); // Outputs all links on the page
+});
+```
+
+- **`login`**: Automates the login process by filling in a username and password, clicking the login button, and verifying that a welcome message appears, confirming a successful login.
+
+### Example Usage of `login`
+
+```typescript
+import { login } from '../utils/login.ts';
+
+test('login test', async ({ page }) => {
+  await login(page, 'your_username', 'your_password');
+  // Additional assertions after login
+});
+```
+
 
 ## Project Tasks
 
